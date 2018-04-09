@@ -17,5 +17,5 @@ include_directories( ${OPENGL_INCLUDE_DIRS}   )
 
 #target_link_libraries(mm_view ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
 
-target_link_libraries(mm_view ${OPENGL_LIBRARIES}  ${GLUT_LIBRARY} glfw3.lib glew32s.lib libpng16_static.lib zlibstatic.lib)
+target_link_libraries(mm_view ${OPENGL_LIBRARIES}  glfw3.lib glew32s.lib libpng16_static.lib zlibstatic.lib)
 # из исходника main.cpp
