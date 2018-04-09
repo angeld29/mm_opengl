@@ -9,7 +9,7 @@ if(WIN32)
 endif(WIN32)
 
 project(mm_view)
-add_executable(mm_view src/mm_view.cpp include/glad.c include/stb_image.cpp)       # Создает исполняемый файл с именем main
+add_executable(mm_view src/mm_view.cpp src/lodfile.cpp include/glad.c include/stb_image.cpp)       # Создает исполняемый файл с именем main
 find_package(OpenGL REQUIRED)
 #find_package(GLUT REQUIRED)
 #include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
