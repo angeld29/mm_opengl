@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <lodfile.h>
 #include <zlib.h>
 #include <algorithm>
-//#include <log.h>
+#include <log.h>
 
 namespace angel{
 
@@ -67,7 +67,7 @@ bool  LodFile::AddLod( const std::string& fname )
 	FILE*f;
 	fopen_s(&f, fname.c_str(), "rb" );
 	
-//	angel::Log << angel::aeLog::debug << "AddLod: "<< fname << angel::aeLog::endl;
+	angel::Log << angel::aeLog::debug << "AddLod: "<< fname << angel::aeLog::endl;
 	if(!f)
 	{
 		
@@ -106,7 +106,7 @@ bool  LodFile::AddLod( const std::string& fname )
 		}
 		delete[]tbl;
 		paks.push_back(lfile);
-//		angel::Log << "Added "<< header.num << " files from " << fname << angel::aeLog::endl;
+		angel::Log << "Added "<< header.num << " files from " << fname << angel::aeLog::endl;
 /*		fclose(f);
 		return false;*/
 	}else
@@ -132,7 +132,7 @@ bool  LodFile::AddLod( const std::string& fname )
 		}
 		delete[]tbl;
 		paks.push_back(lfile);
-//		angel::Log << "Added "<< header.num << " files from " << fname << angel::aeLog::endl;
+		angel::Log << "Added "<< header.num << " files from " << fname << angel::aeLog::endl;
 	}
 	return true;
 }
@@ -160,7 +160,7 @@ LodFile::pak_item_t LodFile::FindFile(const std::string& fname)
 	
 	if( ii == files.end() )
 	{
-//		angel::Log << "LodFile::LoadFile: file "<< tname << " not found" << angel::aeLog::endl;
+		angel::Log << "LodFile::LoadFile: file "<< tname << " not found" << angel::aeLog::endl;
 		pak_item_t pakitm;
 		pakitm.size=-1;
 		return pakitm;
@@ -183,7 +183,7 @@ pLodData LodFile::LoadFileData( const std::string& fname)//для картинок в конец 
 	uint8_t*tmp=new uint8_t[fsize];
 	if(!tmp)
 	{
-//		angel::Log << "LodFile::LoadFileData: file "<< fname << " error alloc mem" <<angel::aeLog::endl;
+		angel::Log << "LodFile::LoadFileData: file "<< fname << " error alloc mem" <<angel::aeLog::endl;
 		return pLodData();
 	}
 	fread(tmp,fsize,1,f);
@@ -193,7 +193,7 @@ pLodData LodFile::LoadFileData( const std::string& fname)//для картинок в конец 
 	unsigned long unpsize2 = *(int*)(hdrdata+0x18);
 	if( unpsize2 && unpsize2 < unpsize1)
 	{
-		//angel::Log << "LodFile::LoadFileData: file "<< fname << " unpsize1 < unpsize2" << angel::aeLog::endl;
+		angel::Log << "LodFile::LoadFileData: file "<< fname << " unpsize1 < unpsize2" << angel::aeLog::endl;
 	}
 	unsigned long unpsize = unpsize2;
 
@@ -201,7 +201,7 @@ pLodData LodFile::LoadFileData( const std::string& fname)//для картинок в конец 
 		unpsize=psize;
 	uint8_t* adddata = hdrdata+ 0x20 + psize;
 	int addsize = fsize - (adddata-tmp);
-	//angel::Log << "LodFile::LoadFileData: file "<< fname << " addsize = "  << addsize << angel::aeLog::endl;
+	angel::Log << "LodFile::LoadFileData: file "<< fname << " addsize = "  << addsize << angel::aeLog::endl;
 	pLodData data(new LodData(unpsize+addsize));
 	uint8_t*unpdata = &(*data)[0];
 	if(unpsize2)
@@ -210,7 +210,7 @@ pLodData LodFile::LoadFileData( const std::string& fname)//для картинок в конец 
 
 		if ( z_res != Z_OK )
 		{
-			//angel::Log << "LodFile::LoadFileData: file "<< fname << " error unpaking " <<  z_res <<angel::aeLog::endl;
+			angel::Log << "LodFile::LoadFileData: file "<< fname << " error unpaking " <<  z_res <<angel::aeLog::endl;
 			delete[]tmp;
 			return pLodData();
 		}
@@ -278,7 +278,7 @@ pLodData LodFile::LoadSpritesFileData(const pak_item_t& pakitm)
 	unsigned long unpsize = *(int*)(tmp+0x1c);
 	if( psize+0x20+height*8 != fsize )
 	{
-		//angel::Log << "LodFile::LoadSpritesFileData: incorrect sprite data size"  << angel::aeLog::endl;
+		angel::Log << "LodFile::LoadSpritesFileData: incorrect sprite data size"  << angel::aeLog::endl;
 		delete[]tmp;
 		return pLodData ();
 	}
@@ -289,7 +289,7 @@ pLodData LodFile::LoadSpritesFileData(const pak_item_t& pakitm)
 
 	if ( z_res != Z_OK )
 	{
-		//angel::Log << "LodFile::LoadFileData: sprite error unpaking " <<  z_res <<angel::aeLog::endl;
+		angel::Log << "LodFile::LoadFileData: sprite error unpaking " <<  z_res <<angel::aeLog::endl;
 		delete[]tmp;
 		return pLodData();
 	}
@@ -328,7 +328,7 @@ pLodData LodFile::LoadMapFileData(const pak_item_t& pakitm)
 
 		if ( psize + 0x10 != fsize )
 		{
-			//angel::Log << "LodFile::LoadMapFileData: invalid map7 size" << angel::aeLog::endl;
+			angel::Log << "LodFile::LoadMapFileData: invalid map7 size" << angel::aeLog::endl;
 		}
 		unsigned long  datasize = *( int * ) ( mdata + 12 );
 		pLodData data(new LodData(datasize));
@@ -337,7 +337,7 @@ pLodData LodFile::LoadMapFileData(const pak_item_t& pakitm)
 		delete[]tmp;
 		if ( z_res != Z_OK )
 		{
-			//angel::Log << "LodFile::LoadMapFileData: error unpaking " <<  z_res <<angel::aeLog::endl;
+			angel::Log << "LodFile::LoadMapFileData: error unpaking " <<  z_res <<angel::aeLog::endl;
 			return pLodData();
 		}
 		return data;
@@ -347,7 +347,7 @@ pLodData LodFile::LoadMapFileData(const pak_item_t& pakitm)
 
 		if ( psize + 0x8 != fsize )
 		{
-			//angel::Log << "LodFile::LoadMapFileData: file invalid map6 size" << angel::aeLog::endl;
+			angel::Log << "LodFile::LoadMapFileData: file invalid map6 size" << angel::aeLog::endl;
 		}
 		unsigned long  datasize = *( int * ) ( mdata + 4 );
 		pLodData data(new LodData(datasize));
@@ -356,7 +356,7 @@ pLodData LodFile::LoadMapFileData(const pak_item_t& pakitm)
 		delete[]tmp;
 		if ( z_res != Z_OK )
 		{
-			//angel::Log << "LodFile::LoadMapFileData:  error unpaking " <<  z_res <<angel::aeLog::endl;
+			angel::Log << "LodFile::LoadMapFileData:  error unpaking " <<  z_res <<angel::aeLog::endl;
 			return pLodData();
 		}
 		return data;

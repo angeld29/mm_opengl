@@ -6,6 +6,8 @@
 #include <learnopengl/shader_s.h>
 
 #include <iostream>
+#include "log.h"
+#include "lodfile.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -16,6 +18,17 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
+	angel::Log.Init("angel.log");
+	std::string gamedir( "C:\\angel\\Prog\\mm\\mm6Data");
+	angel::LodManager.AddLod(gamedir + "/bitmaps.lod");
+	angel::LodManager.AddLod(gamedir + "/games.lod");
+	angel::LodManager.AddLod(gamedir + "/icons.lod");
+	angel::LodManager.AddLod(gamedir + "/events.lod");
+	angel::LodManager.AddLod(gamedir + "/sprites.lod");
+	angel::LodManager.AddLod(gamedir + "/EnglishD.lod");
+	angel::LodManager.AddLod(gamedir + "/EnglishT.lod");
+
+
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
