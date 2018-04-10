@@ -37,7 +37,7 @@ static const std::string typenames[] = {
 bool aeTexture::LoadImage( )
 {
 	std::string fname( name );
-	angel::Log << angel::aeLog::debug <<"aeTexture::LoadPNG: Loading texture "<< fname << angel::aeLog::endl;
+	angel::Log << angel::aeLog::debug <<"aeTexture::LoadImage: Loading texture "<< fname << angel::aeLog::endl;
     
     int width, height, nrChannels;
     unsigned char *data = stbi_load(fname.c_str(), &width, &height, &nrChannels, 0);
@@ -74,7 +74,7 @@ bool aeTexture::LoadImage( )
 			makemipmap =true;
 	}
     
-    glTexImage2D( GL_TEXTURE_2D, 0, nrChannels, width , height, 0,	format, GL_UNSIGNED_BYTE, data );
+    glTexImage2D( GL_TEXTURE_2D, 0, format, width , height, 0,	format, GL_UNSIGNED_BYTE, data );
 	if( makemipmap )
 	{
 		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST ); //GL_LINEAR
@@ -198,8 +198,10 @@ bool aeTexture::LoadFromLod( )
 		return LoadSpriteFromLod();
 	std::string fname = inloddir[type]+basename;
 	auto ldata = LodManager.LoadFile( fname );
-	if(!ldata)
+	if(!ldata){
+        angel::Log << angel::aeLog::debug <<"aeTexture::LoadFromLod: Failed loading texture "<< fname << angel::aeLog::endl;
 		return false;
+    }
     uint8_t*data= &((*ldata)[0]);
     uint32_t size = (uint32_t)ldata->size();
 	uint32_t psize = *(uint32_t*)(data+0x14);

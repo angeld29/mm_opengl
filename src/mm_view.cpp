@@ -16,20 +16,8 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-int main()
+GLFWwindow* InitGL()
 {
-	angel::Log.Init("angel.log");
-	std::string gamedir( "C:\\angel\\Prog\\mm\\mm6Data");
-	angel::LodManager.AddLod(gamedir + "/bitmaps.lod");
-	angel::LodManager.AddLod(gamedir + "/games.lod");
-	angel::LodManager.AddLod(gamedir + "/icons.lod");
-	angel::LodManager.AddLod(gamedir + "/events.lod");
-	angel::LodManager.AddLod(gamedir + "/sprites.lod");
-	angel::LodManager.AddLod(gamedir + "/EnglishD.lod");
-	angel::LodManager.AddLod(gamedir + "/EnglishT.lod");
-
-
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -48,7 +36,7 @@ int main()
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        return -1;
+        return NULL;
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -58,8 +46,26 @@ int main()
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        return NULL;
     }
+    return window;
+}
+
+int main()
+{
+	angel::Log.Init("angel.log");
+    //angel::Log.SetMsgLevel(angel::aeLog::LOG_DEBUG);
+	std::string gamedir( "C:\\angel\\Prog\\mm\\mm6Data");
+	angel::LodManager.AddLod(gamedir + "/bitmaps.lod");
+	angel::LodManager.AddLod(gamedir + "/games.lod");
+	angel::LodManager.AddLod(gamedir + "/icons.lod");
+	angel::LodManager.AddLod(gamedir + "/events.lod");
+	angel::LodManager.AddLod(gamedir + "/sprites.lod");
+	angel::LodManager.AddLod(gamedir + "/EnglishD.lod");
+	angel::LodManager.AddLod(gamedir + "/EnglishT.lod");
+
+    GLFWwindow* window = InitGL();
+    if( !window ) { return -1; }
 
     // build and compile our shader zprogram
     // ------------------------------------
@@ -104,7 +110,8 @@ int main()
 
     // load and create a texture 
     // -------------------------
-    unsigned int texture;
+    std::shared_ptr<aeTexture> tex = TexManager.GetTexture("container.jpg", TT_Texture );
+    /*unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
     // set the texture wrapping parameters
@@ -127,7 +134,7 @@ int main()
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
-
+*/
 
     // render loop
     // -----------
@@ -143,7 +150,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // bind Texture
-        glBindTexture(GL_TEXTURE_2D, texture);
+ //       glBindTexture(GL_TEXTURE_2D, texture);
+        tex->Enable();       
 
         // render container
         ourShader.use();
