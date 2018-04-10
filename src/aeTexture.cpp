@@ -36,7 +36,7 @@ static const std::string typenames[] = {
 };
 bool aeTexture::LoadImage( )
 {
-	std::string fname( name );
+	std::string fname( basename );
 	angel::Log << angel::aeLog::debug <<"aeTexture::LoadImage: Loading texture "<< fname << angel::aeLog::endl;
     
     int width, height, nrChannels;

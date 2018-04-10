@@ -110,7 +110,7 @@ int main()
 
     // load and create a texture 
     // -------------------------
-    std::shared_ptr<aeTexture> tex = TexManager.GetTexture("container.jpg", TT_Texture );
+    std::shared_ptr<aeTexture> tex = TexManager.GetTexture("resources/textures/container.jpg", TT_Texture );
     /*unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
