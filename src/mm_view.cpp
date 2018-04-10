@@ -54,7 +54,7 @@ GLFWwindow* InitGL()
 int main()
 {
 	angel::Log.Init("angel.log");
-    //angel::Log.SetMsgLevel(angel::aeLog::LOG_DEBUG);
+    angel::Log.SetMsgLevel(angel::aeLog::LOG_DEBUG);
 	std::string gamedir( "C:\\angel\\Prog\\mm\\mm6Data");
 	angel::LodManager.AddLod(gamedir + "/bitmaps.lod");
 	angel::LodManager.AddLod(gamedir + "/games.lod");
@@ -110,7 +110,8 @@ int main()
 
     // load and create a texture 
     // -------------------------
-    std::shared_ptr<aeTexture> tex = TexManager.GetTexture("resources/textures/container.jpg", TT_Texture );
+    //std::shared_ptr<aeTexture> tex = TexManager.GetTexture("resources/textures/container.jpg", TT_Texture );
+    std::shared_ptr<aeTexture> tex = TexManager.GetTexture("BemBlLg", TT_Texture );
     /*unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
@@ -191,4 +192,37 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void CheckGlError(  const char *str )
+{
+    std::string errstr;
+	GLenum  err = glGetError();
+	switch( err )
+	{
+	case GL_NO_ERROR:
+		return;
+		break;
+	case GL_INVALID_ENUM:
+		errstr = "glError: GL_INVALID_ENUM";
+		break;
+	case GL_INVALID_VALUE:
+		errstr =  "glError: GL_INVALID_VALUE";
+		break;
+	case GL_INVALID_OPERATION:
+		errstr = "glError: GL_INVALID_OPERATION";
+		break;
+	case GL_STACK_OVERFLOW:
+		errstr = "glError: GL_STACK_OVERFLOW";
+		break;
+	case GL_STACK_UNDERFLOW:
+		errstr =  "glError: GL_STACK_UNDERFLOW";
+		break;
+	case GL_OUT_OF_MEMORY:
+		errstr =  "glError: GL_OUT_OF_MEMORY";
+		break;
+	default:
+		errstr =  "glError: Unknown " + std::to_string(err);
+	}
+    angel::Log << errstr << " (" << str << ")" << angel::aeLog::endl;
 }

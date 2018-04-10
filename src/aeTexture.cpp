@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "log.h"
 #include "lodfile.h"
 
+void CheckGlError( const char *str );
 aeTextureManager TexManager;
 using namespace angel;
 
@@ -88,7 +89,7 @@ bool aeTexture::LoadImage( )
     stbi_image_free(data);
 
 	glBindTexture( GL_TEXTURE_2D,  0 );
-	//CheckGlError("aeTexture::LoadPNG");
+	CheckGlError("aeTexture::LoadPNG");
 	return true;
 }
 
@@ -188,7 +189,7 @@ bool aeTexture::LoadSpriteFromLod( )
 	boost::format fmt(" w:%d h:%d ");
 	fmt % width % height;
 	angel::Log << angel::aeLog::debug << "aeTexture::LoadSpriteFromLod: Loading sprite "<< fname << fmt << angel::aeLog::endl;
-	//CheckGlError("aeTexture::LoadSpriteFromLod");
+	CheckGlError("aeTexture::LoadSpriteFromLod");
 	return true;*/
     return false;
 }
@@ -197,32 +198,29 @@ bool aeTexture::LoadFromLod( )
 	if( type == TT_Sprite )
 		return LoadSpriteFromLod();
 	std::string fname = inloddir[type]+basename;
-	auto ldata = LodManager.LoadFile( fname );
+	auto ldata = LodManager.LoadFileData( fname );
 	if(!ldata){
         angel::Log << angel::aeLog::debug <<"aeTexture::LoadFromLod: Failed loading texture "<< fname << angel::aeLog::endl;
 		return false;
     }
+    auto hdr = angel::LodManager.LoadFileHdr( fname );
     uint8_t*data= &((*ldata)[0]);
-    uint32_t size = (uint32_t)ldata->size();
-	uint32_t psize = *(uint32_t*)(data+0x14);
-	uint32_t unpsize1 = *(uint32_t*)(data+0x10);
-	uLongf unpsize2 = *(uint32_t*)(data+0x28);
-	if( psize+0x30+0x300 != size )
-		return false;
-	if( unpsize2 && unpsize2 < unpsize1)
-		return false;
-	uint8_t* pal = data + 0x30 + psize;
-	uint8_t*unpdata = new uint8_t[unpsize2 ];
 
-	if ( uncompress( unpdata, &unpsize2 , data + 0x30, psize ) != Z_OK )
+    uint8_t*hdrdata= &((*hdr)[0]);
+    uint32_t size = (uint32_t)ldata->size();
+	uint32_t psize = *(uint32_t*)(hdrdata+0x04);
+	uint32_t unpsize1 = *(uint32_t*)(hdrdata+0x0);
+	uint32_t unpsize2 = *(uint32_t*)(hdrdata+0x18);
+    if( unpsize2+0x300 != size )
     {
-        delete[] unpdata;
-		return false;
+        return  false;// loadSprite(res,hdr,ldata);
     }
+    
+    uint8_t *pSrc=data;
+    uint8_t* pal = data + unpsize2;
+    width  = *(uint16_t*)(hdrdata+0x8);
+    height = *(uint16_t*)(hdrdata+0xa);
 	
-	
-	width  = *(int16_t*)(data+0x18);
-	height = *(int16_t*)(data+0x1a);
 	bpp = 4;
 	if( !CheckPOW2(width) || !CheckPOW2(height))
 		return false;
@@ -247,37 +245,37 @@ bool aeTexture::LoadFromLod( )
 	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     int n=0,off=0; 
     
+    uint8_t* pDst = rgbdata; 
     for ( int i = 0; i < imgsize; i++)
     {
-        int index = unpdata[off+i];
+        int index = *pSrc++;
         int r = pal[index*3+0];
         int g = pal[index*3+1];
         int b = pal[index*3+2];
-
+        int a = 0xff;
         if( index == 0 && ((r == 0 && g >250 && b > 250) || (r > 250 && g ==0 && b > 250)))
         {
             r=g=b=0;
-            rgbdata[i*bpp+3]= 0;
+            a = 0; 
         }
-        else
-            rgbdata[i*bpp+3]= 0xff;
 
-        rgbdata[i*bpp+0]= r;
-        rgbdata[i*bpp+1]= g;
-        rgbdata[i*bpp+2]= b;
+        *pDst++ = r;
+        *pDst++ = g;
+        *pDst++ = b;
+        *pDst++ = a;
     }
-    glTexImage2D( GL_TEXTURE_2D, 0, bpp, width , height, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbdata );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width , height, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbdata );
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] rgbdata;
-    delete[] unpdata;
 	
     //boost::format fmt(" w:%d h:%d %d mipmaps");
 	//fmt % width % height % n;
 	angel::Log << angel::aeLog::debug << "aeTexture::LoadFromLod: Loading texture "<< fname << angel::aeLog::endl;
 	glBindTexture( GL_TEXTURE_2D,  0 );
-	//CheckGlError("aeTexture::LoadFromLod");
+	CheckGlError("aeTexture::LoadFromLod");
 	return true;
 }
+
 aeTexture::aeTexture( const std::string& tname, const std::string& basename, uTexType  textype):
 name( tname ), basename(basename), type(textype)
 {
