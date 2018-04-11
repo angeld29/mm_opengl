@@ -74,7 +74,7 @@ int main()
 {
 	angel::Log.Init("angel.log");
     angel::Log.SetMsgLevel(angel::aeLog::LOG_DEBUG);
-	std::string gamedir( "C:\\angel\\Prog\\mm\\mm6Data");
+	std::string gamedir( "../../mm6Data");
 	angel::LodManager.AddLod(gamedir + "/bitmaps.lod");
 	angel::LodManager.AddLod(gamedir + "/games.lod");
 	angel::LodManager.AddLod(gamedir + "/icons.lod");
