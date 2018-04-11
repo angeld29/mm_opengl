@@ -19,12 +19,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "mmMap.h"
 #include "zlib.h"
+#include "log.h"
 
 namespace angel{
+		static const int entname_size = 0x20;
 
 	bool    blvMap::DetectBLVVersion()
 	{
-		DWORD		off = 0x88;
+		uint32_t		off = 0x88;
 #define CHECK_OFF( xxx ) { /*angel::Log << angel::aeLog::debug <<boost::format( " off = %8x size = %8x")% off % (xxx) <<angel::aeLog::endl;*/\
 	off += (xxx);if( off > datasize || off < 0 ) return false;}	
 
@@ -132,12 +134,12 @@ namespace angel{
 		if( DetectBLVVersion() ) return true;
 		return false;
 	}
-    void	LoadBLVMap() {
+    void	blvMap::LoadBLVMap() {
     }
 	blvMap::blvMap( pLodData loddata, std::string name):
-        mmMap(loddata,name)
+        mmMap(loddata,name), data(&(*loddata)[0]),datasize(loddata->size())
 	{
-		angel::Log <<  "Load blvMap " <<  fname << angel::aeLog::endl;
+		angel::Log <<  "Load blvMap " <<  name << angel::aeLog::endl;
 		if(!PrepareBLV() )
 		{
             angel::Log <<  "Cannot detect blv version" <<  mapname << angel::aeLog::endl;
@@ -150,7 +152,7 @@ namespace angel{
 	
 	void blvMap::TogglePortals()
 	{
-/*		DWORD vismask=mSceneMgr->getVisibilityMask();
+/*		uint32_t vismask=mSceneMgr->getVisibilityMask();
 
 		if(!showportals)
 			mSceneMgr->setVisibilityMask(vismask|PORTALS_MASK);
@@ -160,7 +162,7 @@ namespace angel{
 	}
 	void blvMap::ToggleEnts()
 	{
-/*		DWORD vismask=mSceneMgr->getVisibilityMask();
+/*		uint32_t vismask=mSceneMgr->getVisibilityMask();
 		DeselectAll();
 
 		if(!showents)
@@ -169,6 +171,10 @@ namespace angel{
 			mSceneMgr->setVisibilityMask(vismask - (vismask&(SPAWN_MASK|ENTITY_MASK)));
 		showents=!showents;*/
 	}
+
+	void blvMap::Draw()
+    {
+    }
 
 	blvMap::~blvMap()
 	{
@@ -246,7 +252,7 @@ namespace angel{
 		s << facehdr.z_calc[3] <<"\t"<< facehdr.z_calc[4] <<"\t"<< facehdr.z_calc[5] <<"\n";
 
 
-		s <<"FacetType: " <<std::hex << std::setw(2)<<std::setfill('0')<< (DWORD)facehdr.facet_type<<"\t";
+		s <<"FacetType: " <<std::hex << std::setw(2)<<std::setfill('0')<< (uint32_t)facehdr.facet_type<<"\t";
 		s << std::dec ;
 		s << "BitmapIdx: "<<facehdr.bitmap_index <<"\n";
 
@@ -386,7 +392,7 @@ namespace angel{
 	{
 /*		Vector3 crosspoint;
 		Real maxdist = 36000;
-		DWORD vismask=mSceneMgr->getVisibilityMask();
+		uint32_t vismask=mSceneMgr->getVisibilityMask();
 
 		DeselectAll();
 

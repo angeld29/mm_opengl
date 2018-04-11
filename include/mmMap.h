@@ -21,14 +21,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define _ae_mmMap
 #include <vector>
 #include <string>
+#include <inttypes.h>
 #include "lodfile.h"
+#include "aeGeometry.h"
 
 namespace angel{
 	class mmMap{
-    private:
-		std::string mapname;
     protected:
         int version;
+		std::string mapname;
         pLodData loddata;
 	public:
 		mmMap( pLodData _loddata, const std::string name ):
@@ -42,10 +43,11 @@ namespace angel{
 		virtual void ToggleEnts()=0;
 		const std::string& MapName(){ return mapname;}
 		virtual void Select()=0;
-    }
+	};
 
 	class blvMap:public mmMap
     {
+        /*
         typedef struct
         {
             int v_idx;
@@ -70,10 +72,66 @@ namespace angel{
             std::vector<node_t> nodes;
             uint8_t    *bindata;
             int		index,offv;
-        }face_t;
+        }face_t;*/
+#pragma pack(push,1)
+		struct face_blv_t
+		{//starts at 0x10 in mm7,mm8
+			mm_int_plane_s plane;					//0x00
+			short z_calc[6];						//0x10 Z_CALC1,Z_CALC2,Z_CALC3,
+			int attrib;								//0x1c
+			int VERTEX_INDEX_OFFSET,				//0x20 //not used(fills on load)
+				X_DISPLACEMENT_OFFSET,
+				Y_DISPLACEMENT_OFFSET,
+				Z_DISPLACEMENT_OFFSET,
+				U_TEXTURE_OFFSET,					//0x30
+				V_TEXTURE_OFFSET;
+			uint16_t fparm_index;				//0x38
+			short			   bitmap_index;			//0x3a
+			uint16_t			   room_number,				//0x3c
+						   room_behind_number;		//0x3e
+			mm_short_bbox_s bbox;					//0x40
+			uint8_t facet_type,numvertex;				//0x4c
+			uint8_t padding[2];						//0x4e (unused?)
+		};
+		struct faceparams_blv_t
+		{
+			mm_int_vec3_s	fade;					//0x00
+			uint16_t	facet_index;					//0x0c
+			short	bitmap_index;					//0x0e
+			uint16_t	texture_frame_table_index;		//0x10
+			uint16_t	texture_frame_table_COG;		//0x12
+			short tex_u;							//0x14 tex_u
+			short tex_v;							//0x16 tex_u
+			uint16_t  cog_number;						//0x18 
+			uint16_t  cog_triggered;					//0x1A event index
+			uint16_t  cog_trigger_type;					//0x1c
+			short	fade_base_x;					//0x1e
+			short	fade_base_y;					//0x20
+			uint16_t	light_level;					//0x22
+		};
+		struct blv_spawn_t
+		{
+			mm_int_vec3_s origin;			//0x00
+			uint16_t radius;					//0x0c
+			uint16_t type_id;					//0x0e
+			uint16_t index;						//0x10
+			uint16_t attrib;					//0x12
+		};
+		struct blv_ent_t
+		{
+			uint16_t declist_id;				//0x00
+			uint16_t AIattrMarkers;				//0x02
+			mm_int_vec3_s origin;			//0x04
+			int facing;						//0x10
+			uint16_t evt1,evt2;					//0x14
+			uint16_t var1,var2;					//0x18
+		};
+
+#pragma pack(pop)
 
         private:
-            //uint32_t    datasize;
+            uint32_t    datasize;
+            uint8_t *data;
 
             short   *vertex_data;
             int		num_vertex;
@@ -84,7 +142,7 @@ namespace angel{
             uint8_t    *facetextures;
 
             int		numfaceparms;
-            uint8_t    *faceparams1;
+            faceparams_blv_t    *faceparams1;
             uint8_t    *faceparams2;
 
             int		num_sectors;
@@ -96,7 +154,7 @@ namespace angel{
             int		num_sprites_hz;
             int		num_sprites;
             uint8_t	*spritesdata;
-            uint8_t	*spritesnamesdata;
+            char	*spritesnamesdata;
             int		num_lights;
             uint8_t	*lightsdata;
             int		num_unk9;
@@ -114,8 +172,8 @@ namespace angel{
             
             bool	showportals;
 
-            std::vector<vec3_t> vertexes;
-            std::vector<face_t> faces;
+            //std::vector<vec3_t> vertexes;
+            //std::vector<face_t> faces;
 //            face_t* selected_face;
 
             bool    PrepareBLV();
