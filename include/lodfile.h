@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <fstream>
 #include <cstdio>
 #include <memory>
-//#include <Windows.h>
 
 namespace angel{
     typedef std::vector<uint8_t> LodData;

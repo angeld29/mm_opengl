@@ -72,6 +72,10 @@ public:
         glDeleteShader(fragment);
 
     }
+    ~Shader()
+    {
+        glDeleteProgram(ID);
+    }
     // activate the shader
     // ------------------------------------------------------------------------
     void use() const
