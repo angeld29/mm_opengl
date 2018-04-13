@@ -12,13 +12,13 @@
 
 class Render {
     private:
-        unsigned int VBO, VAO;
-        Shader ourShader;
+        unsigned int VBO, VAO, lampVAO;
+        Shader ourShader, lampShader;
         std::shared_ptr<aeTexture> tex1,tex2;
     public:
         Render();
         ~Render();
-        void Draw(glm::mat4 projection, glm::mat4 view );
+        void Draw(glm::mat4 projection, glm::mat4 view, Camera camera);
 };
 
 #endif //_aeRender
