@@ -146,7 +146,7 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
         
         // world transformation
         glm::mat4 model;
-        ourShader.setMat4("model", model);
+        //ourShader.setMat4("model", model);
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
@@ -154,9 +154,22 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
         glActiveTexture(GL_TEXTURE1);
         tex2->Enable();
 
-        // render the cube
+        // render boxes
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model;
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            ourShader.setMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        // render the cube
+        //glBindVertexArray(VAO);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
         // also draw the lamp object
@@ -170,19 +183,6 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
 
         glBindVertexArray(lampVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        /*// render boxes
-        glBindVertexArray(VAO);
-        for (unsigned int i = 0; i < 10; i++)
-        {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model;
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            ourShader.setMat4("model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }*/
 }
 /*    
 // set up vertex data (and buffer(s)) and configure vertex attributes
