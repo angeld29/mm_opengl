@@ -52,17 +52,17 @@ namespace angel{
 		struct blv_face_t
 		{//starts at 0x10 in mm7,mm8
 			mm_int_plane_s plane;					//0x00
-			short z_calc[6];						//0x10 Z_CALC1,Z_CALC2,Z_CALC3,
-			int attrib;								//0x1c
-			int VERTEX_INDEX_OFFSET,				//0x20 //not used(fills on load)
+			int16_t z_calc[6];						//0x10 Z_CALC1,Z_CALC2,Z_CALC3,
+			uint32_t attrib;								//0x1c
+			uint32_t VERTEX_INDEX_OFFSET,				//0x20 //not used(fills on load)
 				X_DISPLACEMENT_OFFSET,
 				Y_DISPLACEMENT_OFFSET,
 				Z_DISPLACEMENT_OFFSET,
 				U_TEXTURE_OFFSET,					//0x30
 				V_TEXTURE_OFFSET;
-			uint16_t fparm_index;				//0x38
-			short			   bitmap_index;			//0x3a
-			uint16_t			   room_number,				//0x3c
+			uint16_t        fparm_index;				//0x38
+			uint16_t		bitmap_index;			//0x3a
+			uint16_t	    room_number,				//0x3c
 						   room_behind_number;		//0x3e
 			mm_short_bbox_s bbox;					//0x40
 			uint8_t facet_type,numvertex;				//0x4c
@@ -72,16 +72,16 @@ namespace angel{
 		{
 			mm_int_vec3_s	fade;					//0x00
 			uint16_t	facet_index;					//0x0c
-			short	bitmap_index;					//0x0e
+			uint16_t	bitmap_index;					//0x0e
 			uint16_t	texture_frame_table_index;		//0x10
 			uint16_t	texture_frame_table_COG;		//0x12
-			short tex_u;							//0x14 tex_u
-			short tex_v;							//0x16 tex_u
+			int16_t tex_u;							//0x14 tex_u
+			int16_t tex_v;							//0x16 tex_u
 			uint16_t  cog_number;						//0x18 
 			uint16_t  cog_triggered;					//0x1A event index
 			uint16_t  cog_trigger_type;					//0x1c
-			short	fade_base_x;					//0x1e
-			short	fade_base_y;					//0x20
+			int16_t	fade_base_x;					//0x1e
+			int16_t	fade_base_y;					//0x20
 			uint16_t	light_level;					//0x22
 		};
 		struct blv_faceparams2_t
@@ -115,6 +115,13 @@ namespace angel{
             blv_face_t blv_face; 
             blv_faceparams_t blv_faceparam;
             blv_faceparams2_t blv_faceparam2;
+			std::vector<uint16_t> vertex_idxs;
+			std::vector<int16_t> vertex_normal_x;
+			std::vector<int16_t> vertex_normal_y;
+			std::vector<int16_t> vertex_normal_z;
+
+			std::vector<int16_t> vertex_tex_x;
+			std::vector<int16_t> vertex_tex_y;
         };
 }
 #endif //_ae_blvMap_types

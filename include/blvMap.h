@@ -31,7 +31,7 @@ namespace angel{
             int		num_vertex;
             uint8_t    *faces_array;
             int		num_faces;
-            short   *facedata;
+            int16_t   *facedata;
             int     facedatasize;
             uint8_t    *facetextures;
 
@@ -76,9 +76,8 @@ namespace angel{
             bool	showportals;
             std::vector<mm_short_vec3_s> vertexes;
 
-            //std::vector<vec3_t> vertexes;
             std::vector<face_t> faces;
-//            face_t* selected_face;
+            std::vector<std::string> texnames;
 
             bool    PrepareBLV();
             bool    DetectBLVVersion();
