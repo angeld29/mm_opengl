@@ -37,7 +37,7 @@ namespace angel{
 
             int		numfaceparms;
             blv_faceparams_t  *faceparams1;
-            uint8_t    *faceparams2;
+            blv_faceparams2_t  *faceparams2;
 
             int		num_sectors;
             uint8_t	*sectorsdata;
@@ -74,9 +74,10 @@ namespace angel{
             blv_map_sizes_t map_sizes;
             
             bool	showportals;
+            std::vector<mm_short_vec3_s> vertexes;
 
             //std::vector<vec3_t> vertexes;
-            //std::vector<face_t> faces;
+            std::vector<face_t> faces;
 //            face_t* selected_face;
 
             bool    PrepareBLV();

@@ -84,6 +84,10 @@ namespace angel{
 			short	fade_base_y;					//0x20
 			uint16_t	light_level;					//0x22
 		};
+		struct blv_faceparams2_t
+		{
+            uint8_t unk[0xa];
+        };
 		struct blv_spawn_t
 		{
 			mm_int_vec3_s origin;			//0x00
@@ -103,5 +107,14 @@ namespace angel{
 		};
 
 #pragma pack(pop)
+        struct face_t
+        {
+            std::string texname;
+            
+            mm_float_plane_s blv_plane7;
+            blv_face_t blv_face; 
+            blv_faceparams_t blv_faceparam;
+            blv_faceparams2_t blv_faceparam2;
+        };
 }
 #endif //_ae_blvMap_types

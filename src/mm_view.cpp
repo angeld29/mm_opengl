@@ -11,6 +11,7 @@
 #include "lodfile.h"
 #include "aeTexture.h"
 #include "Render.h"
+#include "blvMap.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -86,10 +87,11 @@ int main()
     GLFWwindow* window = InitGL();
     if( !window ) { return -1; }
     Render render;
+    angel::blvMap map(angel::LodManager.LoadFileData( "maps/d01.blv" ),"maps/d01.blv");
 
     // render loop
     // -----------
-    while (!glfwWindowShouldClose(window))
+    //while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
         // --------------------

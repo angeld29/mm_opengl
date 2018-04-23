@@ -52,7 +52,7 @@ namespace angel{
 			//faceparams1 = data +off;
 			map_data.faceparams1  = (blv_faceparams_t*)(data+off);
 			CHECK_OFF(map_data.numfaceparms *0x24);
-			map_data.faceparams2 = data +off;
+			map_data.faceparams2 = (blv_faceparams2_t*)(data +off);
 			CHECK_OFF(map_data.numfaceparms *0x0a);
 		}
 		{
@@ -135,6 +135,43 @@ namespace angel{
 		return false;
 	}
     void	blvMap::LoadBLVMap() {
+		{// get vertexs
+			vertexes.resize(map_data.num_vertex);
+			std::copy((mm_short_vec3_s*)map_data.vertex_data,(mm_short_vec3_s*)map_data.vertex_data+map_data.num_vertex,vertexes.begin());
+
+		}
+		{//faces
+			faces.reserve( map_data.num_faces );
+
+            char texture_name[0xa+1];
+            texture_name[0xa]=0;
+			for ( int i = 0; i < map_data.num_faces; i++ )
+			{
+
+				face_t  face;// = faces[i];
+				std::copy((char*)map_data.facetextures + i * 0xa,(char*)map_data.facetextures + i * 0xa+0x0a,texture_name);
+                face.texname = texture_name;
+
+				uint8_t* bindata = map_data.faces_array + i * map_sizes.facesize;
+				if( version > 6) 
+				{
+					face.blv_plane7 = *(mm_float_plane_s*)(bindata);
+					face.blv_face = *(blv_face_t*)(bindata +0x10);
+				}else
+				{
+					face.blv_face = *(blv_face_t*)(bindata );
+					face.blv_plane7.normal.x = (float)face.blv_face.plane.normal.x/65536.0;
+					face.blv_plane7.normal.y = (float)face.blv_face.plane.normal.y/65536.0;
+					face.blv_plane7.normal.z = (float)face.blv_face.plane.normal.z/65536.0;
+					face.blv_plane7.dist	 = (float)face.blv_face.plane.dist/65536.0;
+				}
+				face.blv_faceparam = map_data.faceparams1[face.blv_face.fparm_index];
+				face.blv_faceparam2 = map_data.faceparams2[face.blv_face.fparm_index];
+
+				faces.push_back(face);
+			}
+
+		}
     }
 	blvMap::blvMap( pLodData loddata, std::string name):
         mmMap(loddata,name), data(&(*loddata)[0]),datasize(loddata->size())
@@ -147,7 +184,7 @@ namespace angel{
 		};
         LoadBLVMap( );
 		
-		//angel::Log <<  "Loaded faces: " << faces.size() << ", vertexs: " << vertexes.size() << angel::aeLog::endl;
+		angel::Log <<  "Loaded faces: " << faces.size() << ", vertexs: " << vertexes.size() << angel::aeLog::endl;
 	}
 	
 	void blvMap::TogglePortals()
