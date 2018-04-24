@@ -70,7 +70,8 @@ static glm::vec3 cubePositions[] = {
 };
 // lighting
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-Mesh CreateMesh(std::shared_ptr<aeTexture> tex){
+std::shared_ptr<Mesh> mesh;
+Mesh* CreateMesh(std::shared_ptr<aeTexture> tex){
     vector<Vertex> vertices_list;
     vector<unsigned int> indices;
     vector<Texture> textures;
@@ -99,20 +100,25 @@ Mesh CreateMesh(std::shared_ptr<aeTexture> tex){
         indices.push_back(j);
     Texture texture;
     texture.id = tex->glID(); 
-    texture.type = "texture";
+    texture.type = "texture_diffuse";
     texture.path = "texture";
     textures.push_back(texture);
 
-    return Mesh(vertices_list, indices, textures);
+    return new Mesh(vertices_list, indices, textures);
 }
 
 Render::Render():
     //ourShader("resources/vertex.vs", "resources/fragment.fs") 
-    ourShader("resources/4.2.lighting_maps.vs", "resources/4.2.lighting_maps.fs"),
-    lampShader("resources/4.2.lamp.vs", "resources/4.2.lamp.fs")
+    ourShader("resources/1.model_loading.vs", "resources/1.model_loading.fs"),
+    //lampShader("resources/4.2.lamp2.vs", "resources/4.2.lamp2.fs")
+    //lampShader("resources/1.model_loading.vs", "resources/4.2.lamp2.fs")
+    lampShader("resources/1.model_loading.vs", "resources/1.model_loading.fs")
 {
     glEnable(GL_DEPTH_TEST);
-    glGenVertexArrays(1, &VAO);
+    tex1 = TexManager.GetTexture("resources/textures/container2.png", TT_Texture );
+    tex2 = TexManager.GetTexture("resources/textures/container2_specular.png", TT_Texture );
+    mesh.reset( CreateMesh(tex1));
+    /*glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -141,10 +147,10 @@ Render::Render():
     tex2 = TexManager.GetTexture("resources/textures/container2_specular.png", TT_Texture );
     
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-    // -------------------------------------------------------------------------------------------
-    ourShader.use();
-    ourShader.setInt("material.diffuse", 0);
-    ourShader.setInt("material.specular", 1);
+    // -------------------------------------------------------------------------------------------*/
+    //ourShader.use();
+/*    ourShader.setInt("material.diffuse", 0);
+    ourShader.setInt("material.specular", 1);*/
 }
 
 Render::~Render()
@@ -156,6 +162,7 @@ Render::~Render()
     glDeleteBuffers(1, &VBO);
 }
 
+void CheckGlError(  const char *str );
 void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
 {
         // render
@@ -164,7 +171,7 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
         
         ourShader.use();
-        ourShader.setVec3("light.position", lightPos);
+    /*    ourShader.setVec3("light.position", lightPos);
         ourShader.setVec3("viewPos", camera.Position);
 
         // light properties
@@ -174,7 +181,7 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
 
         // material properties
         ourShader.setFloat("material.shininess", 64.0f);
-        
+       */ 
         // pass projection matrix to shader (note that in this case it could change every frame)
         ourShader.setMat4("projection", projection);
         // camera/view transformation
@@ -185,13 +192,13 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
         //ourShader.setMat4("model", model);
 
         // bind textures on corresponding texture units
-        glActiveTexture(GL_TEXTURE0);
-        tex1->Enable();
-        glActiveTexture(GL_TEXTURE1);
-        tex2->Enable();
+        //glActiveTexture(GL_TEXTURE0);
+        //tex1->Enable();
+        //glActiveTexture(GL_TEXTURE1);
+        //tex2->Enable();*/
 
         // render boxes
-        glBindVertexArray(VAO);
+        //glBindVertexArray(VAO);
         for (unsigned int i = 0; i < 10; i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing
@@ -200,16 +207,27 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            mesh->Draw(ourShader);
+            
+         //   glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         // render the cube
         //glBindVertexArray(VAO);
         //glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // also draw the lamp object
+        //lampShader.use();
+        /*lampShader.setMat4("projection", projection);
+        lampShader.setMat4("view", view);
+        model = glm::mat4();
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        lampShader.setMat4("model", model);
+        //ourShader.setMat4("model", model);
+        mesh->Draw(lampShader);*/
 
         // also draw the lamp object
-        lampShader.use();
+        /*lampShader.use();
         lampShader.setMat4("projection", projection);
         lampShader.setMat4("view", view);
         model = glm::mat4();
@@ -218,7 +236,7 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
         lampShader.setMat4("model", model);
 
         glBindVertexArray(lampVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_TRIANGLES, 0, 36);*/
 }
 /*    
 // set up vertex data (and buffer(s)) and configure vertex attributes

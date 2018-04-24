@@ -91,7 +91,7 @@ int main()
 
     // render loop
     // -----------
-    //while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
         // --------------------
