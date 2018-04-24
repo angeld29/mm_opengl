@@ -70,7 +70,7 @@ static glm::vec3 cubePositions[] = {
 };
 // lighting
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-std::shared_ptr<Mesh> mesh;
+std::shared_ptr<Mesh> mesh,mesh2;
 Mesh* CreateMesh(std::shared_ptr<aeTexture> tex){
     vector<Vertex> vertices_list;
     vector<unsigned int> indices;
@@ -110,9 +110,9 @@ Mesh* CreateMesh(std::shared_ptr<aeTexture> tex){
 Render::Render():
     //ourShader("resources/vertex.vs", "resources/fragment.fs") 
     ourShader("resources/1.model_loading.vs", "resources/1.model_loading.fs"),
-    //lampShader("resources/4.2.lamp2.vs", "resources/4.2.lamp2.fs")
+    lampShader("resources/4.2.lamp2.vs", "resources/4.2.lamp2.fs")
     //lampShader("resources/1.model_loading.vs", "resources/4.2.lamp2.fs")
-    lampShader("resources/1.model_loading.vs", "resources/1.model_loading.fs")
+    //lampShader("resources/1.model_loading.vs", "resources/1.model_loading.fs")
 {
     glEnable(GL_DEPTH_TEST);
     tex1 = TexManager.GetTexture("resources/textures/container2.png", TT_Texture );
@@ -187,8 +187,6 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
         // camera/view transformation
         ourShader.setMat4("view", view);
         
-        // world transformation
-        glm::mat4 model;
         //ourShader.setMat4("model", model);
 
         // bind textures on corresponding texture units
@@ -216,15 +214,18 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
         //glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // also draw the lamp object
-        //lampShader.use();
-        /*lampShader.setMat4("projection", projection);
+        // world transformation
+        glm::mat4 model;
+        
+        lampShader.use();
+        lampShader.setMat4("projection", projection);
         lampShader.setMat4("view", view);
         model = glm::mat4();
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lampShader.setMat4("model", model);
         //ourShader.setMat4("model", model);
-        mesh->Draw(lampShader);*/
+        mesh->Draw(lampShader);
 
         // also draw the lamp object
         /*lampShader.use();
