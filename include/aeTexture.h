@@ -53,6 +53,7 @@ class aeTexture
     int                     Height() { return height; }
     int                     Bpp()    { return bpp;    }
     const std::string&      Name()   { return name;   }
+    UINT                    glID()   { return GLID;   }
 
     // ¬ключить текстуру
     void    Enable()

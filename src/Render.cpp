@@ -4,6 +4,7 @@
 
 #include <learnopengl/shader_m.h>
 #include <learnopengl/camera.h>
+#include <learnopengl/mesh.h>
 #include "log.h"
 #include "Render.h"
 #include "lodfile.h"
@@ -69,6 +70,41 @@ static glm::vec3 cubePositions[] = {
 };
 // lighting
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+Mesh CreateMesh(std::shared_ptr<aeTexture> tex){
+    vector<Vertex> vertices_list;
+    vector<unsigned int> indices;
+    vector<Texture> textures;
+    for(unsigned int i = 0; i < 36; i++){
+        Vertex vertex;
+        glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
+        vector.x = vertices[i*8+0];
+        vector.y = vertices[i*8+1];
+        vector.z = vertices[i*8+2];
+        vertex.Position = vector;
+        // normals
+        vector.x = vertices[i*8+3];
+        vector.y = vertices[i*8+4];
+        vector.z = vertices[i*8+5];
+        vertex.Normal = vector;
+
+        glm::vec2 vec;
+        // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
+        // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
+        vec.x = vertices[i*8+6]; 
+        vec.y = vertices[i*8+7]; 
+        vertex.TexCoords = vec;
+        vertices_list.push_back(vertex);
+    }
+    for(unsigned int j = 0; j < 36; j++)
+        indices.push_back(j);
+    Texture texture;
+    texture.id = tex->glID(); 
+    texture.type = "texture";
+    texture.path = "texture";
+    textures.push_back(texture);
+
+    return Mesh(vertices_list, indices, textures);
+}
 
 Render::Render():
     //ourShader("resources/vertex.vs", "resources/fragment.fs") 
