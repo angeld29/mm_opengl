@@ -1,13 +1,18 @@
+#include <glad/glad.h> // holds all OpenGL type declarations
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <learnopengl/shader_m.h>
+#include <learnopengl/shader.h>
 #include <learnopengl/camera.h>
 #include <learnopengl/mesh.h>
 #include "log.h"
 #include "Render.h"
 #include "lodfile.h"
+#include <string>
+#include <memory>
+#include <map>
+#define mesh_draw
 
 // set up vertex data (and buffer(s)) and configure vertex attributes
 // ------------------------------------------------------------------
@@ -115,10 +120,14 @@ Render::Render():
     //lampShader("resources/1.model_loading.vs", "resources/1.model_loading.fs")
 {
     glEnable(GL_DEPTH_TEST);
+    // load and create a texture 
+    // -------------------------
     tex1 = TexManager.GetTexture("resources/textures/container2.png", TT_Texture );
     tex2 = TexManager.GetTexture("resources/textures/container2_specular.png", TT_Texture );
+#ifdef mesh_draw
     mesh.reset( CreateMesh(tex1));
-    /*glGenVertexArrays(1, &VAO);
+#else
+    glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -140,17 +149,14 @@ Render::Render():
     // note that we update the lamp's position attribute's stride to reflect the updated buffer data
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    ourShader.use();
+    ourShader.setInt("texture_diffuse1", 0);
 
-    // load and create a texture 
-    // -------------------------
-    tex1 = TexManager.GetTexture("resources/textures/container2.png", TT_Texture );
-    tex2 = TexManager.GetTexture("resources/textures/container2_specular.png", TT_Texture );
-    
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------*/
-    //ourShader.use();
 /*    ourShader.setInt("material.diffuse", 0);
     ourShader.setInt("material.specular", 1);*/
+#endif
 }
 
 Render::~Render()
@@ -190,54 +196,46 @@ void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
         //ourShader.setMat4("model", model);
 
         // bind textures on corresponding texture units
-        //glActiveTexture(GL_TEXTURE0);
-        //tex1->Enable();
-        //glActiveTexture(GL_TEXTURE1);
-        //tex2->Enable();*/
-
+#ifndef mesh_draw
+        glActiveTexture(GL_TEXTURE0);
+        tex1->Enable();
+        glActiveTexture(GL_TEXTURE1);
+        tex2->Enable();
         // render boxes
-        //glBindVertexArray(VAO);
+        glBindVertexArray(VAO);
+#endif
+
         for (unsigned int i = 0; i < 10; i++)
         {
             // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model;
+            glm::mat4 model = glm::mat4();
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
+#ifdef mesh_draw
             mesh->Draw(ourShader);
-            
-         //   glDrawArrays(GL_TRIANGLES, 0, 36);
+#else            
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+#endif
         }
-        // render the cube
-        //glBindVertexArray(VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
-
         // also draw the lamp object
-        // world transformation
-        glm::mat4 model;
-        
+#if 1        
         lampShader.use();
         lampShader.setMat4("projection", projection);
         lampShader.setMat4("view", view);
-        model = glm::mat4();
+        glm::mat4 model = glm::mat4();
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
         lampShader.setMat4("model", model);
-        //ourShader.setMat4("model", model);
+#ifdef mesh_draw
         mesh->Draw(lampShader);
-
-        // also draw the lamp object
-        /*lampShader.use();
-        lampShader.setMat4("projection", projection);
-        lampShader.setMat4("view", view);
-        model = glm::mat4();
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lampShader.setMat4("model", model);
-
+#else
         glBindVertexArray(lampVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);*/
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+#endif
+#endif
+
 }
 /*    
 // set up vertex data (and buffer(s)) and configure vertex attributes
