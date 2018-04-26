@@ -87,7 +87,7 @@ namespace angel{
         public:
             blvMap( pLodData _loddata, const std::string name );
             ~blvMap();
-            virtual void Draw();
+            virtual void Draw(glm::mat4 projection, glm::mat4 view, Camera camera);
             virtual void TogglePortals();
             virtual void ToggleEnts();
             virtual void Select();

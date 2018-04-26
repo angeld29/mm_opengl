@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <vector>
 #include <string>
 #include <inttypes.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <learnopengl/camera.h>
 #include "lodfile.h"
 #include "aeGeometry.h"
 
@@ -37,7 +41,7 @@ namespace angel{
         {
         }
 		~mmMap(){};
-		virtual void Draw()=0;
+		virtual void Draw(glm::mat4 projection, glm::mat4 view, Camera camera)=0;
 		int MapVersion() { return version;}  
 		virtual void TogglePortals()=0;
 		virtual void ToggleEnts()=0;
