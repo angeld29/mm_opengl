@@ -62,8 +62,8 @@ GLFWwindow* InitGL()
     return window;
 }
 
-//Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-Camera camera(glm::vec3(0.0f, 12.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+//Camera camera(glm::vec3(0.0f, 12.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -75,7 +75,7 @@ float lastFrame = 0.0f;
 int main()
 {
 	angel::Log.Init("angel.log");
-    angel::Log.SetMsgLevel(angel::aeLog::LOG_DEBUG);
+  //  angel::Log.SetMsgLevel(angel::aeLog::LOG_DEBUG);
 	std::string gamedir( "../../mm6Data");
 	angel::LodManager.AddLod(gamedir + "/bitmaps.lod");
 	angel::LodManager.AddLod(gamedir + "/games.lod");

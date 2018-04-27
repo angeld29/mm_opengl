@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include <learnopengl/shader.h>
 #include <learnopengl/camera.h>
@@ -42,8 +43,8 @@ namespace angel{
             vector.x = (float)mm_vertex.x/ 128.0f;
             vector.y = (float)mm_vertex.y/ 128.0f;
             vector.z = (float)mm_vertex.z/ 128.0f;
-            angel::Log << vector.x << " " << vector.y << " " << vector.z << angel::aeLog::endl;
-            angel::Log << mm_vertex.x << " " << mm_vertex.y << " " << mm_vertex.z << angel::aeLog::endl;
+            //angel::Log << vector.x << " " << vector.y << " " << vector.z << angel::aeLog::endl;
+            //angel::Log << mm_vertex.x << " " << mm_vertex.y << " " << mm_vertex.z << angel::aeLog::endl;
             vertex.Position = vector;
             // normals
             vector.x = face.vertex_normal_x[i]/65536.0f;
@@ -58,7 +59,7 @@ namespace angel{
             vec.x = float( face.blv_faceparam.tex_u + face.vertex_tex_x[i] ) / face.tex->Width(); 
             vec.y = float( face.blv_faceparam.tex_v + face.vertex_tex_y[i] ) / face.tex->Height(); 
             vertex.TexCoords = vec;
-            angel::Log << vec.x << " " << vec.y << angel::aeLog::endl;
+            //angel::Log << vec.x << " " << vec.y << angel::aeLog::endl;
             vertices_list.push_back(vertex);
         }
         for(int i = 1; i < face.blv_face.numvertex - 1; i++){
@@ -300,7 +301,8 @@ namespace angel{
         // camera/view transformation
         ourShader.setMat4("view", view);
         glm::mat4 model = glm::mat4();
-        model = glm::translate(model, glm::vec3(0.0f,0.0f,0.0f));
+        //model = glm::translate(model, glm::vec3(0.0f,0.0f,0.0f));
+        //model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
         ourShader.setMat4("model", model);
         
         int count = 0;
