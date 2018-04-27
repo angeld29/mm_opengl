@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define _ae_blvMap
 #include "mmMap.h"
 #include "blvMap_types.h"
+#include <learnopengl/mesh.h>
 
 namespace angel{
 	class blvMap:public mmMap
@@ -77,11 +78,12 @@ namespace angel{
             std::vector<mm_short_vec3_s> vertexes;
 
             std::vector<face_t> faces;
-            std::vector<std::string> texnames;
 
             bool    PrepareBLV();
             bool    DetectBLVVersion();
             void	LoadBLVMap();
+            Mesh*   CreateMesh(const face_t& face);
+            Shader ourShader;
             //bool	isPortal( const   face_t & face );
             //void	RenderPortals();
         public:

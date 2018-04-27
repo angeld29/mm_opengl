@@ -20,10 +20,57 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "blvMap.h"
 #include "zlib.h"
 #include "log.h"
+#include "aeTexture.h"
 #include <algorithm>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <learnopengl/shader.h>
+#include <learnopengl/camera.h>
+#include <learnopengl/mesh.h>
 
 namespace angel{
-		static const int entname_size = 0x20;
+    Mesh* blvMap::CreateMesh(const face_t& face){
+        vector<Vertex> vertices_list;
+        vector<unsigned int> indices;
+        vector<Texture> textures;
+        for(int i = 0; i < face.blv_face.numvertex+1; i++){
+            Vertex vertex;
+            glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
+            mm_short_vec3_s mm_vertex = vertexes[ face.vertex_idx[i] ];
+            vector.x = (float)mm_vertex.x;
+            vector.y = (float)mm_vertex.y;
+            vector.z = (float)mm_vertex.z;
+            vertex.Position = vector;
+            // normals
+            vector.x = face.vertex_normal_x[i]/65536.0f;
+            vector.y = face.vertex_normal_y[i]/65536.0f;
+            vector.z = face.vertex_normal_z[i]/65536.0f;
+            vertex.Normal = vector;
+
+            glm::vec2 vec;
+            // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
+            // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
+            vec.x = float( face.blv_faceparam.tex_u + face.vertex_tex_x[i] ) / face.tex->Width(); 
+            vec.y = float( face.blv_faceparam.tex_v + face.vertex_tex_y[i] ) / face.tex->Height(); 
+            vertex.TexCoords = vec;
+            vertices_list.push_back(vertex);
+        }
+        for(int i = 1; i < face.blv_face.numvertex - 1; i++){
+            indices.push_back(0);
+            indices.push_back(i);
+            indices.push_back(i+1);
+        }
+        Texture texture;
+        texture.id = face.tex->glID(); 
+        texture.type = "texture_diffuse";
+        texture.path = "texture";
+        textures.push_back(texture);
+
+        return new Mesh(vertices_list, indices, textures);
+    }
+    static const int entname_size = 0x20;
 
 	bool    blvMap::DetectBLVVersion()
 	{
@@ -153,7 +200,6 @@ namespace angel{
 				face_t  face;// = faces[i];
 				std::copy((char*)map_data.facetextures + i * 0xa,(char*)map_data.facetextures + i * 0xa+0x0a,texture_name);
                 face.texname = texture_name;
-                texnames.push_back(face.texname);
 
 				uint8_t* bindata = map_data.faces_array + i * map_sizes.facesize;
 				if( version > 6) 
@@ -178,14 +224,14 @@ namespace angel{
 					angel::Log << angel::aeLog::debug <<"Face " << i << " has  < 3 nodes "<< numv << " off:"<< bindata - data << angel::aeLog::endl;
 				}
 
-                face.vertex_idxs.resize( numv +1);
+                face.vertex_idx.resize( numv +1);
 				face.vertex_normal_x.resize( numv +1);
 				face.vertex_normal_y.resize( numv +1);
 				face.vertex_normal_z.resize( numv +1);
 				face.vertex_tex_x.resize( numv + 1 );
 				face.vertex_tex_y.resize( numv + 1 );
 				
-                memcpy(&face.vertex_idxs[0], v + (numv+1)* 0, numv*2 +2 );
+                memcpy(&face.vertex_idx[0], v + (numv+1)* 0, numv*2 +2 );
 				memcpy(&face.vertex_normal_x[0], v + (numv+1)* 1, numv*2 +2 );
 				memcpy(&face.vertex_normal_y[0], v + (numv+1)* 2, numv*2 +2);
 				memcpy(&face.vertex_normal_z[0], v + (numv+1)* 3, numv*2+2);
@@ -193,16 +239,20 @@ namespace angel{
 				memcpy(&face.vertex_tex_y[0], v + (numv+1)* 5, numv*2+2);
 				v += ( numv + 1 ) * 6;
 
+                if( face.texname.size() )
+                {
+                    face.tex = TexManager.GetTexture( face.texname, TT_Texture);
+                    face.mesh.reset ( CreateMesh( face ));
+                }
+
 				faces.push_back(face);
 			}
-            texnames.erase(
-                    std::unique(texnames.begin(), texnames.end()),
-                    texnames.end());
 
 		}
     }
 	blvMap::blvMap( pLodData loddata, std::string name):
-        mmMap(loddata,name), data(&(*loddata)[0]),datasize(loddata->size())
+        mmMap(loddata,name), data(&(*loddata)[0]),datasize(loddata->size()),
+        ourShader("resources/1.model_loading.vs", "resources/1.model_loading.fs")
 	{
 		angel::Log <<  "Load blvMap " <<  name << angel::aeLog::endl;
 		if(!PrepareBLV() )
@@ -212,7 +262,7 @@ namespace angel{
 		};
         LoadBLVMap( );
 		
-		angel::Log <<  "Loaded faces: " << faces.size() << ", vertexs: " << vertexes.size() <<  " textures: " << texnames.size()  << angel::aeLog::endl;
+		angel::Log <<  "Loaded faces: " << faces.size() << ", vertexs: " << vertexes.size() << angel::aeLog::endl;
 	}
 	
 	void blvMap::TogglePortals()
@@ -239,6 +289,25 @@ namespace angel{
 
 	void blvMap::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
     {
+        
+        ourShader.use();
+        // pass projection matrix to shader (note that in this case it could change every frame)
+        ourShader.setMat4("projection", projection);
+        // camera/view transformation
+        ourShader.setMat4("view", view);
+        glm::mat4 model = glm::mat4();
+        model = glm::translate(model, glm::vec3(0.0f,0.0f,0.0f));
+        ourShader.setMat4("model", model);
+        
+        int count = 0;
+		for(  auto i  = faces.begin(); i != faces.end(); ++i)
+        {
+            face_t &face = *i;
+            if( ! face.mesh ) continue;
+            face.mesh->Draw(ourShader);
+            count++;
+            break;
+        }
     }
 
 	blvMap::~blvMap()

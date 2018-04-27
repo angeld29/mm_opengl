@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _ae_blvMap_types
 #define _ae_blvMap_types
 #include "aeGeometry.h"
+#include "aeTexture.h"
+#include <learnopengl/mesh.h>
 namespace angel{
         /*
         typedef struct
@@ -110,12 +112,14 @@ namespace angel{
         struct face_t
         {
             std::string texname;
+            std::shared_ptr<aeTexture> tex;
+            std::shared_ptr<Mesh> mesh;
             
             mm_float_plane_s blv_plane7;
             blv_face_t blv_face; 
             blv_faceparams_t blv_faceparam;
             blv_faceparams2_t blv_faceparam2;
-			std::vector<uint16_t> vertex_idxs;
+			std::vector<uint16_t> vertex_idx;
 			std::vector<int16_t> vertex_normal_x;
 			std::vector<int16_t> vertex_normal_y;
 			std::vector<int16_t> vertex_normal_z;

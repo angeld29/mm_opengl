@@ -171,11 +171,6 @@ Render::~Render()
 void CheckGlError(  const char *str );
 void Render::Draw(glm::mat4 projection, glm::mat4 view, Camera camera)
 {
-        // render
-        // ------
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-        
         ourShader.use();
     /*    ourShader.setVec3("light.position", lightPos);
         ourShader.setVec3("viewPos", camera.Position);

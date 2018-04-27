@@ -87,10 +87,13 @@ int main()
     GLFWwindow* window = InitGL();
     if( !window ) { return -1; }
     Render render;
+    glEnable(GL_DEPTH_TEST);
     angel::blvMap map(angel::LodManager.LoadFileData( "maps/d01.blv" ),"maps/d01.blv");
 
     // render loop
     // -----------
+
+    //glPolygonMode( GL_FRONT, GL_FILL );
     while (!glfwWindowShouldClose(window))
     {
         // per-frame time logic
@@ -104,8 +107,12 @@ int main()
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
+        
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-        render.Draw(projection, view, camera);
+        //render.Draw(projection, view, camera);
+        map.Draw(projection, view, camera);
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
