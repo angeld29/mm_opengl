@@ -40,9 +40,9 @@ namespace angel{
             Vertex vertex;
             glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
             mm_short_vec3_s mm_vertex = vertexes[ face.vertex_idx[i] ];
-            vector.x = (float)mm_vertex.x/ 128.0f;
-            vector.y = (float)mm_vertex.y/ 128.0f;
-            vector.z = (float)mm_vertex.z/ 128.0f;
+            vector.x = (float)mm_vertex.x;
+            vector.y = (float)mm_vertex.y;
+            vector.z = (float)mm_vertex.z;
             //angel::Log << vector.x << " " << vector.y << " " << vector.z << angel::aeLog::endl;
             //angel::Log << mm_vertex.x << " " << mm_vertex.y << " " << mm_vertex.z << angel::aeLog::endl;
             vertex.Position = vector;
