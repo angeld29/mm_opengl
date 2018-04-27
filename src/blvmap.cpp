@@ -39,15 +39,18 @@ namespace angel{
             Vertex vertex;
             glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
             mm_short_vec3_s mm_vertex = vertexes[ face.vertex_idx[i] ];
-            vector.x = (float)mm_vertex.x;
-            vector.y = (float)mm_vertex.y;
-            vector.z = (float)mm_vertex.z;
+            vector.x = (float)mm_vertex.x/ 128.0f;
+            vector.y = (float)mm_vertex.y/ 128.0f;
+            vector.z = (float)mm_vertex.z/ 128.0f;
+            angel::Log << vector.x << " " << vector.y << " " << vector.z << angel::aeLog::endl;
+            angel::Log << mm_vertex.x << " " << mm_vertex.y << " " << mm_vertex.z << angel::aeLog::endl;
             vertex.Position = vector;
             // normals
             vector.x = face.vertex_normal_x[i]/65536.0f;
             vector.y = face.vertex_normal_y[i]/65536.0f;
             vector.z = face.vertex_normal_z[i]/65536.0f;
             vertex.Normal = vector;
+            angel::Log << vector.x << " " << vector.y << " " << vector.z << angel::aeLog::endl;
 
             glm::vec2 vec;
             // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
@@ -55,6 +58,7 @@ namespace angel{
             vec.x = float( face.blv_faceparam.tex_u + face.vertex_tex_x[i] ) / face.tex->Width(); 
             vec.y = float( face.blv_faceparam.tex_v + face.vertex_tex_y[i] ) / face.tex->Height(); 
             vertex.TexCoords = vec;
+            angel::Log << vec.x << " " << vec.y << angel::aeLog::endl;
             vertices_list.push_back(vertex);
         }
         for(int i = 1; i < face.blv_face.numvertex - 1; i++){
@@ -306,7 +310,6 @@ namespace angel{
             if( ! face.mesh ) continue;
             face.mesh->Draw(ourShader);
             count++;
-            break;
         }
     }
 

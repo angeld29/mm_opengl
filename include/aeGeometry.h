@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #ifndef aeGeometry
 #define aeGeometry
+#include <inttypes.h>
 namespace angel{
 #pragma pack(push,1)
        	struct mm_int_vec3_s
@@ -55,7 +56,7 @@ namespace angel{
        	};
        	struct mm_short_vec3_s
        	{
-       		short x,y,z;
+       		int16_t x,y,z;
 			inline friend std::ostream& operator <<
 				( std::ostream& o, const mm_short_vec3_s& v )
 			{
@@ -65,9 +66,9 @@ namespace angel{
        	};
        	struct mm_short_bbox_s
        	{
-			short minx,maxx;
-			short miny,maxy;
-			short minz,maxz;
+			int16_t minx,maxx;
+			int16_t miny,maxy;
+			int16_t minz,maxz;
 			inline friend std::ostream& operator <<
 				( std::ostream& o, const mm_short_bbox_s& v )
 			{
