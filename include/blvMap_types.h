@@ -103,7 +103,7 @@ namespace angel{
 			uint16_t declist_id;				//0x00
 			uint16_t AIattrMarkers;				//0x02
 			mm_int_vec3_s origin;			//0x04
-			int facing;						//0x10
+			int32 facing;						//0x10
 			uint16_t evt1,evt2;					//0x14
 			uint16_t var1,var2;					//0x18
 		};

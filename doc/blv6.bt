@@ -1,0 +1,152 @@
+//------------------------------------------------
+//--- 010 Editor v8.0.1 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+typedef struct {
+    DWORD map_flags;
+    char description[76];
+    char unk[24];
+    DWORD wall_vertex_size, Rdatasize, RLdatasize, unksize;
+    int32 unk2[4];
+}blv6_header_s;
+blv6_header_s header;
+
+DWORD num_vertex;
+
+typedef struct {
+  int16 x,y,z;
+}vec3_int16_s;
+vec3_int16_s vertexes[num_vertex];
+
+DWORD num_faces;
+typedef struct {
+    int32 x,y,z;
+}vec3_int_s;
+
+typedef struct {
+    vec3_int_s normal;
+    int32 dist;
+}plane_int_s;
+
+typedef struct {
+    int16 minx,maxx,miny,maxy,minz,maxz;
+}bbox_in16_s;
+  
+struct blv_face_t
+{//starts at 0x10 in mm7,mm8
+    plane_int_s plane;					//0x00
+    int16 z_calc[6];						//0x10 Z_CALC1,Z_CALC2,Z_CALC3,
+    uint32 attrib;								//0x1c
+    uint32 VERTEX_INDEX_OFFSET,				//0x20 //not used(fills on load)
+             X_DISPLACEMENT_OFFSET,
+             Y_DISPLACEMENT_OFFSET,
+             Z_DISPLACEMENT_OFFSET,
+             U_TEXTURE_OFFSET,					//0x30
+             V_TEXTURE_OFFSET;
+    uint16      fparm_index;				//0x38
+    uint16		bitmap_index;			//0x3a
+    uint16    room_number,				//0x3c
+                    room_behind_number;		//0x3e
+    bbox_in16_s bbox;					//0x40
+    byte facet_type,numvertex;				//0x4c
+    byte padding[2];						//0x4e (unused?)
+};
+blv_face_t faces[num_faces];
+int16 wall_vertexes[header.wall_vertex_size /2 ];
+typedef struct{
+    char name[10];
+}texture_name;
+texture_name texnames[num_faces];
+
+typedef struct 
+{
+    vec3_int_s	fade;					//0x00
+    uint16	facet_index;					//0x0c
+    uint16	bitmap_index;					//0x0e
+    uint16	texture_frame_table_index;		//0x10
+    uint16	texture_frame_table_COG;		//0x12
+    int16 tex_u;							//0x14 tex_u
+    int16 tex_v;							//0x16 tex_u
+    uint16  cog_number;						//0x18 
+    uint16  cog_triggered;					//0x1A event index
+    uint16  cog_trigger_type;					//0x1c
+    int16	fade_base_x;					//0x1e
+    int16	fade_base_y;					//0x20
+    uint16	light_level;					//0x22
+}blv_faceparams_s;
+typedef struct 
+{
+    byte unk[0xa];
+}blv_faceparams2_s;
+
+DWORD num_faceparams;
+blv_faceparams_s faceparams1[num_faceparams];
+blv_faceparams2_s faceparams2[num_faceparams];
+
+DWORD num_sectors;
+typedef struct{
+    byte unk[0x74];
+}blv_sector_s;
+blv_sector_s sectors[num_sectors];
+
+byte sectorsRdata[header.Rdatasize];
+byte sectorsRLdata[header.RLdatasize];
+
+DWORD num_ents_hz,num_ents;
+typedef struct{
+    uint16 declist_id;				//0x00
+    uint16 AIattrMarkers;				//0x02
+    vec3_int_s origin;			//0x04
+    int32 facing;						//0x10
+    uint16 evt1,evt2;					//0x14
+    uint16 var1,var2;					//0x18
+}blv6_ent_s;
+blv6_ent_s ents[num_ents];
+
+typedef struct{
+    char name[0x20];
+}ent_name;
+ent_name ent_names[num_ents];
+
+DWORD num_lights;
+typedef struct{
+    vec3_int16_s pos;
+    // int16 radius;
+    // byte r,g,b,type;
+    uint16 skip;
+    uint16 bits;
+    int16 radius;
+}blv6_light_s;
+
+blv6_light_s lights[num_lights];
+
+DWORD num_d;
+typedef struct{
+    uint16 unk[4];
+}blv6_d_s;
+blv6_d_s d[num_d];
+
+DWORD num_spawn;
+typedef struct{
+    vec3_int_s pos;			//0x00
+    uint16 radius;					//0x0c
+    uint16 type_id;					//0x0e
+    uint16 index;						//0x10
+    uint16 attrib;					//0x12
+}blv6_spawn_s;
+blv6_spawn_s spawns[num_spawn];
+
+DWORD num_outlines;
+typedef struct{
+    int16 v1,v2,f1,f2,z,bits;					//0x0c
+    //bits 1-visible;
+}blv6_outline_s;
+blv6_outline_s outlines[num_outlines];
