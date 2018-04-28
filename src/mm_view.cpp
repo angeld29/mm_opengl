@@ -12,7 +12,7 @@
 #include "aeTexture.h"
 #include "Render.h"
 #include "blvMap.h"
-
+#include <windows.h>
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -89,7 +89,19 @@ int main()
     if( !window ) { return -1; }
     Render render;
     glEnable(GL_DEPTH_TEST);
-    angel::blvMap map(angel::LodManager.LoadFileData( "maps/d01.blv" ),"maps/d01.blv");
+
+    char mapname[0x1000];
+	GetPrivateProfileString( "Game","mapname" , "maps/d01.blv", mapname, sizeof(mapname),".\\config.ini");
+
+    angel::pLodData mapdata = angel::LodManager.LoadFileData( mapname);
+    if( GetPrivateProfileInt( "Game","save_map" , 0,".\\config.ini") )
+    {
+        ofstream OutFile;
+        OutFile.open(mapname, ios::out | ios::binary);
+        OutFile.write( (char*)&(*mapdata)[0], mapdata->size());
+        OutFile.close();    
+    }
+    angel::blvMap map(mapdata, mapname);
 
     // render loop
     // -----------
