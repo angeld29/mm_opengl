@@ -36,6 +36,10 @@ namespace angel{
         vector<Vertex> vertices_list;
         vector<unsigned int> indices;
         vector<Texture> textures;
+        if( face.blv_face.numvertex < 2 )
+        {
+            return NULL;
+        }
         for(int i = 0; i < face.blv_face.numvertex+1; i++){
             Vertex vertex;
             glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
@@ -47,11 +51,11 @@ namespace angel{
             //angel::Log << mm_vertex.x << " " << mm_vertex.y << " " << mm_vertex.z << angel::aeLog::endl;
             vertex.Position = vector;
             // normals
-            vector.x = face.vertex_normal_x[i]/65536.0f;
-            vector.y = face.vertex_normal_y[i]/65536.0f;
-            vector.z = face.vertex_normal_z[i]/65536.0f;
+            vector.x = (float)face.vertex_normal_x[i]/65536.0f;
+            vector.y = (float)face.vertex_normal_y[i]/65536.0f;
+            vector.z = (float)face.vertex_normal_z[i]/65536.0f;
             vertex.Normal = vector;
-            angel::Log << vector.x << " " << vector.y << " " << vector.z << angel::aeLog::endl;
+//            angel::Log << vector.x << " " << vector.y << " " << vector.z << angel::aeLog::endl;
 
             glm::vec2 vec;
             // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
@@ -67,6 +71,7 @@ namespace angel{
             indices.push_back(i);
             indices.push_back(i+1);
         }
+        angel::Log << indices.size() << angel::aeLog::endl;
         Texture texture;
         texture.id = face.tex->glID(); 
         texture.type = "texture_diffuse";
